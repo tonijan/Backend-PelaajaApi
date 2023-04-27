@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from app.database.models import PlayerDb, PlayerIn
-from app.database.database import players, save_player, fetch_player_events_by_type, fetch_player_and_events
+from app.database.models import PlayerDb, PlayerIn, EventDb, EventIn
+from app.database.database import players, save_player, fetch_player_events_by_type, fetch_player_and_events, save_event
 
 router = APIRouter(prefix='/players')
 
@@ -26,3 +26,9 @@ def get_player(id: int):
 @router.get('/{id}/events', status_code=status.HTTP_200_OK)
 def get_player_events(id: int, type: str = ""):
     return fetch_player_events_by_type(id, type)
+
+
+#creating a new event for the player
+@router.post('/{id}/events', response_model=EventDb, status_code=status.HTTP_201_CREATED)
+def create_event(event_in: EventIn, id: int):
+    return save_event(event_in, id)

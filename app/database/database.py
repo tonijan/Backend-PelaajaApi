@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from .models import PlayerDb, EventDb
+from datetime import datetime
 
 players = [
     {'id': 0, 'name': 'Toni Jantunen', 'events': []},
@@ -14,12 +15,23 @@ events = [
 ]
 
 
-#kesken
 def save_player(player_in):
     new_id = len(players)
     player = PlayerDb(**player_in.dict(), id=new_id)
     players.append(player.dict())
     return player
+
+def save_event(event_in, id):
+    get_player_index(id)
+    time = datetime.now().strftime("%Y/%m/%d, %H:%M:%S")
+    new_id = len(events)
+    event = EventDb(**event_in.dict(), id=new_id, player_id=id, timestamp=time)
+    if event_in.dict()['type'] != "level_solved" and event_in.dict()['type'] != "level_started":
+        raise HTTPException(detail="Unknown event type", status_code=status.HTTP_400_BAD_REQUEST)
+    events.append(event.dict())
+    return event
+
+
 
 def get_player_index(id: int):
     index = -1
