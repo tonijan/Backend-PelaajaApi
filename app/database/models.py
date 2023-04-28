@@ -1,19 +1,22 @@
-from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+from .database import Base
 
-class EventIn(BaseModel):
-    type: str
-    detail: str 
+class Player(Base):
+    __tablename__ = 'players'
 
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
 
-class EventDb(EventIn):
-    id: int
-    player_id: int
-    timestamp: str
+    events = relationship('Event', back_populates ='player')
 
+class Event(Base):
+    __tablename__ = 'events'
 
-class PlayerIn(BaseModel):
-    name: str
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, nullable=False)
+    detail = Column(String, nullable=False)
+    timestamp = Column(String, nullable=False)
+    player_id = Column(Integer, ForeignKey('players.id'))
 
-
-class PlayerDb(PlayerIn):
-    id: int
+    player = relationship('Player', back_populates='events')

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from app.database.models import EventDb, EventIn
+from app.database.schemas import EventDb, EventIn
 from app.database.database import fetch_events_by_type
 
 router = APIRouter(prefix='/events')

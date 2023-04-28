@@ -1,19 +1,29 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from app.database.models import PlayerDb, PlayerIn, EventDb, EventIn
-from app.database.database import players, save_player, fetch_player_events_by_type, fetch_player_and_events, save_event
+from app.database.schemas import PlayerDb, PlayerIn, EventDb, EventIn
+from app.database.database import players, save_player, fetch_player_events_by_type, fetch_player_and_events, save_event, SessionLocal
+from ..database import crud
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix='/players')
 
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 #getting all players names and ids
 @router.get('', response_model=list[PlayerDb], status_code=status.HTTP_200_OK)
-def get_players():
-    return players
+def get_players(db: Session = Depends(get_db)):
+    return crud.read_players(db)
 
 
 #creating a new player
 @router.post('', response_model=PlayerDb, status_code=status.HTTP_201_CREATED)
-def create_player(player_in: PlayerIn):
-    return save_player(player_in)
+def create_player(player_in: PlayerIn, db: Session = Depends(get_db)):
+    return crud.create_player(db, player_in)
 
 
 #getting a player by id and events
