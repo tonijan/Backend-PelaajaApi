@@ -23,3 +23,8 @@ class PlayerIn(BaseModel):
 
 class PlayerDb(PlayerIn):
     id: int
+
+
+class PlayerAllListItem(PlayerIn):
+    id: int
+    events: list[EventDb]
